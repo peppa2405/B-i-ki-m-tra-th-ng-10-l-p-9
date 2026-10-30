@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đề Kiểm Tra Định Kỳ Chuyên Anh Vào 10</title>
+    <style>
+        :root {
+            --primary: #5b8c5a;
+            --primary-hover: #4a7549;
+            --bg: #f4f7f6;
+            --surface: #ffffff;
+            --text: #333333;
+            --danger: #d32f2f;
+            --border: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            padding: 15px 20px;
+            border-bottom: 3px solid var(--primary);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        h1, h2, h3 { color: var(--primary); }
+        h1 { text-align: center; margin-top: 0; }
+        
+        .timer { font-size: 1.8em; font-weight: bold; color: var(--primary); font-variant-numeric: tabular-nums; }
+        .timer.danger { color: var(--danger); animation: pulse 1s infinite; }
+        .strike-counter { font-weight: bold; color: var(--danger); font-size: 1.1em; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .rules {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .passage {
+            background: #fafafa;
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.05em;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .question-block { margin-bottom: 25px; }
+        .question-text { font-weight: 600; margin-bottom: 10px; font-size: 1.05em; }
+        
+        .options label {
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: #f9f9f9;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .options label:hover { background: #f1f8f1; border-color: var(--primary); }
+        .options input[type="radio"] { margin-right: 10px; }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 140, 90, 0.2);
+        }
+        textarea { resize: vertical; min-height: 150px; }
+
+        .student-info {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin-top: 40px;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover { background-color: var(--primary-hover); }
+        .btn-submit:disabled { background-color: #a5a5a5; cursor: not-allowed; }
+
+        .result-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .result-box {
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .score-display { font-size: 3em; font-weight: bold; color: var(--primary); margin: 20px 0; }
+        
+        .locked-screen {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--danger);
+        }
+        .locked-screen h1 { color: var(--danger); font-size: 2.5em; }
+    </style>
+</head>
+<body>
+
+<div class="sticky-header">
+    <div class="timer" id="timer">120:00</div>
+    <div class="strike-counter" id="strike-counter">Cảnh cáo: 0/3</div>
+</div>
+
+<div class="container" id="exam-container">
+    <h1>ĐỀ KIỂM TRA ĐỊNH KỲ CHUYÊN ANH</h1>
+    <div class="rules">
+        <strong>⚠️ QUY CHẾ THI:</strong>
+        <ul style="margin-top: 5px; margin-bottom: 0;">
+            <li>Thời gian làm bài: 120 phút. Hệ thống sẽ tự động nộp bài khi hết giờ.</li>
+            <li><strong>Không sao chép, không chuyển tab hoặc thu nhỏ trình duyệt.</strong></li>
+            <li>Hệ thống sẽ khóa bài thi ngay lập tức nếu phát hiện vi phạm 3 lần.</li>
+        </ul>
+    </div>
+
+    <!-- Endpoint form submit đã được thay bằng link Formspree của bạn -->
+    <form id="exam-form" action="https://formspree.io/f/xkjgpabg" method="POST">
+        <input type="hidden" name="Final_Score" id="hidden-score" value="0">
+        
+        <!-- Phần điền thông tin học sinh để giáo viên biết bài của ai -->
+        <div class="student-info">
+            <label class="question-text" for="student_name">Họ và tên học sinh (Bắt buộc):</label>
+            <input type="text" id="student_name" name="Student_Name" placeholder="Nhập họ và tên của bạn..." required>
+        </div>
+        
+        <h2>PART A: LEXICO-GRAMMAR (20 points)</h2>
+        <div id="part-a"></div>
+
+        <h2>PART B: ERROR CORRECTION (10 points)</h2>
+        <div class="passage">
+            The development of modern technology has had a profound influence <b>(1) for</b> society. Just a few decades ago, people <b>(2) rarely were</b> able to communicate instantly across the globe. Today, hardly anyone goes through a day without plugging <b>(3) on</b> their devices. However, this convenience comes with a cost. Some people become so addicted to the Internet that they neglect <b>(4) another</b> aspects of their lives. Furthermore, personal data <b>(5) is often belonged</b> to large corporations, which use it for targeted advertising. Were it not for strict privacy laws, users' information would be completely exposed. Unfortunately, many users still do not take cybersecurity <b>(6) serious</b>. A new virus <b>(7) was broken out</b> recently, causing millions of computers to crash. If users had installed antivirus software, their data <b>(8) would not be lost</b> now. It is high time people paid <b>(9) much</b> attention to their digital footprint. (Lỗi thứ 10: <b>(10) another</b> lặp lại ở câu tiếp theo).
+            <br><br><i>*Lưu ý: Chỉ điền TỪ ĐÃ SỬA VÀO Ô TRỐNG (không điền từ sai). Ví dụ ô 1 điền: on</i>
+        </div>
+        <div id="part-b"></div>
+
+        <h2>PART C: READING (30 points)</h2>
+        <h3>I. Guided Cloze</h3>
+        <div class="passage">
+            The advent of the Internet has completely transformed the (1) ________ of modern journalism. In the past, people relied heavily on broadsheets and tabloids to get their daily news. Today, anyone with a smartphone can (2) ________ out what is happening around the world in seconds. This shift has forced traditional media outlets to adapt or face becoming obsolete. Many newspapers have (3) ________ the conclusion that they must establish a strong online presence. Furthermore, the rise of social media means that news is no longer carefully (4) ________ by professional editors. Instead, individuals can broadcast their own stories. This democratisation of media is exciting, but it also raises (5) ________ about the accuracy of the information being shared.
+        </div>
+        <div id="part-c1"></div>
+
+        <h3>II. Open Cloze</h3>
+        <div class="passage">
+            Having a hobby is indispensable (1) ________ maintaining a healthy work-life balance. In today's fast-paced world, people are often overwhelmed by time constraints and the demands of their careers. (2) ________ it not for leisure activities, the stress of daily life would lead to severe burnout. Some people take (3) ________ sports like tennis or swimming, which not (4) ________ improve physical health but also provide opportunities to make friends. (5) ________ prefer solitary pursuits such as reading or gardening.
+        </div>
+        <div id="part-c2"></div>
+
+        <h3>III. Reading Comprehension</h3>
+        <div class="passage">
+            Artificial Intelligence (AI) is no longer a concept confined to science fiction; it is rapidly becoming a fundamental part of our daily lives. From virtual assistants that schedule our appointments to algorithms that curate our social media feeds, AI's influence is ubiquitous.<br><br>
+            One of the most significant impacts of AI is in the healthcare sector. Machine learning models are now capable of analysing medical images with a level of precision that often surpasses human practitioners. This allows for the early detection of diseases, which can significantly mitigate adverse health outcomes.<br><br>
+            However, the integration of AI into society is not without its challenges. Critics argue that the automation of tasks previously performed by humans will inevitably lead to widespread job displacement. Furthermore, there are growing concerns regarding data privacy and the potential for algorithms to perpetuate existing social biases. To address these issues, it is imperative that developers establish robust guardrails and prioritise transparency in AI systems.
+        </div>
+        <div id="part-c3"></div>
+
+        <h2>PART D: WRITING (40 points)</h2>
+        <h3>I. Sentence Transformation</h3>
+        <div id="part-d1"></div>
+
+        <h3>II. Essay Writing</h3>
+        <div class="question-block">
+            <p class="question-text">Some people believe that modern media and social networks have brought people closer together. Others argue that they have isolated individuals and negatively affected society. Discuss both views and give your opinion.</p>
+            <!-- Thẻ textarea có name="essay" sẽ được gửi về Formspree -->
+            <textarea name="essay" placeholder="Type your essay here... (This section will be manually graded by the teacher)"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">NỘP BÀI KẾT THÚC</button>
+    </form>
+</div>
+
+<!-- Màn hình khóa khi vi phạm -->
+<div class="container locked-screen" id="locked-screen">
+    <h1>🚫 BÀI THI ĐÃ BỊ KHÓA 🚫</h1>
+    <h2>Bạn đã vi phạm quy chế thi (chuyển tab/thoát màn hình) quá 3 lần.</h2>
+    <p>Hệ thống đã ghi nhận điểm các câu bạn đã làm trước khi bị khóa.</p>
+    <div class="score-display" id="locked-score-display">0/55</div>
+</div>
+
+<!-- Popup báo điểm -->
+<div class="result-overlay" id="result-overlay">
+    <div class="result-box">
+        <h2>🎉 HOÀN THÀNH BÀI THI 🎉</h2>
+        <p>Điểm phần Trắc nghiệm & Điền khuyết:</p>
+        <div class="score-display" id="final-score-display">0/55</div>
+        <p><i>(Phần Viết Luận sẽ được giáo viên chấm thủ công và cộng vào tổng điểm sau)</i></p>
+    </div>
+</div>
+
+<script>
+    // --- CẤU TRÚC DỮ LIỆU ĐỀ THI ---
+    const partA_data = [
+        { q: "1. The referee's controversial decision ________ a heated argument among the spectators.", opts: ["A. brought up", "B. came about", "C. broke out", "D. brought forward"], ans: 2 },
+        { q: "2. Rarely ________ such a meticulously designed physical experiment in a high school laboratory.", opts: ["A. they carry out", "B. do they carry out", "C. they are carried out", "D. are they carried out"], ans: 3 },
+        { q: "3. The newly launched tabloid is ________ popular among teenagers, though its articles are often misleading.", opts: ["A. highly", "B. high", "C. depth", "D. deeply"], ans: 0 },
+        { q: "4. A strange phenomenon ________ in the sky last night, baffling local astronomers.", opts: ["A. was appeared", "B. had been appeared", "C. appeared", "D. was appearing by itself"], ans: 2 },
+        { q: "5. If it ________ for the sudden breakdown of the engine, they would have won the race.", opts: ["A. wasn't", "B. weren't", "C. hadn't been", "D. hasn't been"], ans: 2 },
+        { q: "6. Some of the journalists were granted interviews, but ________ were completely ignored by the celebrity.", opts: ["A. another", "B. the other", "C. others", "D. the others"], ans: 3 },
+        { q: "7. Not only ________ the match, but he also suffered a severe injury.", opts: ["A. did he lose", "B. he lost", "C. he did lose", "D. lost he"], ans: 0 },
+        { q: "8. The factory output this quarter is twice ________ it was during the previous phase.", opts: ["A. as high as", "B. higher than", "C. as higher as", "D. more high than"], ans: 0 },
+        { q: "9. The company ________ to roll out a new electronic device next month.", opts: ["A. expects", "B. is expected", "C. expected", "D. is expecting"], ans: 1 },
+        { q: "10. She bought a ________ bag to carry her sports gear.", opts: ["A. canvas green large", "B. large green canvas", "C. green large canvas", "D. large canvas green"], ans: 1 },
+        { q: "11. He was totally taken ________ when he discovered the truth about his extended family.", opts: ["A. out", "B. away", "C. aback", "D. up"], ans: 2 },
+        { q: "12. Had the government acted sooner, the crisis ________.", opts: ["A. would be averted", "B. would have averted", "C. would have been averted", "D. had been averted"], ans: 2 },
+        { q: "13. Her argument ________ perfect sense to the committee during the debate.", opts: ["A. did", "B. took", "C. made", "D. caused"], ans: 2 },
+        { q: "14. The old castle ________ on the hill for centuries, overlooking the quiet village.", opts: ["A. has been stood", "B. stands", "C. is standing by", "D. is stood"], ans: 1 },
+        { q: "15. ________ you need any further assistance with the equipment, do not hesitate to ask.", opts: ["A. Should", "B. Were", "C. Had", "D. If"], ans: 0 },
+        { q: "16. The editor decided to ________ the story because it lacked factual evidence.", opts: ["A. turn over", "B. put off", "C. look down on", "D. leave out"], ans: 3 },
+        { q: "17. I have two rackets. One is broken, and ________ is missing its strings.", opts: ["A. another", "B. the other", "C. others", "D. other"], ans: 1 },
+        { q: "18. Under no circumstances ________ confidential documents outside the premises.", opts: ["A. employees must remove", "B. must employees remove", "C. should remove employees", "D. employees should remove"], ans: 1 },
+        { q: "19. We found the speaker's arguments on artificial intelligence completely ________.", opts: ["A. unconvincing", "B. unconvincingly", "C. unconvince", "D. convincingly"], ans: 0 },
+        { q: "20. She has a real talent ________ picking up new languages effortlessly.", opts: ["A. in", "B. with", "C. for", "D. on"], ans: 2 }
+    ];
+
+    const partB_ans = ["on", "were rarely", "in", "other", "often belongs", "seriously", "broke out", "would not have been lost", "more", "other"];
+    
+    const partC1_data = [
+        { q: "1.", opts: ["A. view", "B. scene", "C. landscape", "D. background"], ans: 2 },
+        { q: "2.", opts: ["A. find", "B. make", "C. figure", "D. look"], ans: 0 },
+        { q: "3.", opts: ["A. arrived", "B. reached", "C. come", "D. taken"], ans: 1 },
+        { q: "4.", opts: ["A. curated", "B. delegated", "C. mitigated", "D. overwhelmed"], ans: 0 },
+        { q: "5.", opts: ["A. arguments", "B. questions", "C. answers", "D. discussions"], ans: 1 }
+    ];
+
+    const partC2_ans = ["for", "were", "up", "only", "others"];
+
+    const partC3_data = [
+        { q: "1. What is the primary focus of the passage?", opts: ["A. The history of AI in science fiction.", "B. The benefits and challenges of AI in modern society.", "C. How AI is replacing doctors in hospitals.", "D. The mechanisms behind machine learning algorithms."], ans: 1 },
+        { q: "2. The word 'ubiquitous' in paragraph 1 is closest in meaning to:", opts: ["A. rare", "B. hidden", "C. everywhere", "D. dangerous"], ans: 2 },
+        { q: "3. According to paragraph 2, how does AI benefit healthcare?", opts: ["A. It replaces the need for medical imaging.", "B. It schedules appointments for doctors automatically.", "C. It analyses medical images with high precision.", "D. It cures diseases completely."], ans: 2 },
+        { q: "4. The word 'mitigate' in paragraph 2 is closest in meaning to:", opts: ["A. worsen", "B. increase", "C. reduce", "D. ignore"], ans: 2 },
+        { q: "5. Which of the following is NOT mentioned as a challenge of AI?", opts: ["A. Job displacement.", "B. The high cost of AI development.", "C. Data privacy concerns.", "D. The perpetuation of social biases."], ans: 1 }
+    ];
+
+    const partD1_data = [
+        { pre: "1. They believe that the suspect has fled the country. (IS)<br>-> The suspect", post: "", ans: "is believed to have fled the country" },
+        { pre: "2. She started playing tennis when she was ten years old. (TOOK)<br>-> She", post: "she was ten.", ans: "took up tennis when" },
+        { pre: "3. I didn't realise the danger until the storm hit. (NOT UNTIL)<br>-> Not until", post: "", ans: "the storm hit did I realise the danger" },
+        { pre: "4. If you don't wear a helmet, you will be fined. (OTHERWISE)<br>-> You must", post: "", ans: "wear a helmet; otherwise, you will be fined" },
+        { pre: "5. The machine suddenly stopped working during the experiment. (BROKE)<br>-> The machine", post: "", ans: "broke down during the experiment" },
+        { pre: "6. The new manager was given complete freedom to change the system. (REIN)<br>-> The new manager was", post: "", ans: "given free rein to change the system" },
+        { pre: "7. He speaks English much more fluently than his brother does. (AS)<br>-> His brother doesn't", post: "", ans: "speak English as fluently as he does" },
+        { pre: "8. They didn't help us, so we couldn't finish the project on time. (HAD)<br>-> Had", post: "", ans: "they helped us, we could have finished the project on time" },
+        { pre: "9. Only one of the boys was wearing a uniform; where were the uniforms of the rest? (OTHERS)<br>-> Only one of the boys was wearing a uniform; where were", post: "?", ans: "the others" },
+        { pre: "10. The teacher did not tolerate the students' bad behaviour any longer. (PUT)<br>-> The teacher refused", post: "", ans: "to put up with the students' bad behaviour any longer" }
+    ];
+
+    // --- HÀM RENDER UI ---
+    function renderMCQ(containerId, data, prefix) {
+        const container = document.getElementById(containerId);
+        data.forEach((item, index) => {
+            let html = `<div class="question-block"><div class="question-text">${item.q}</div><div class="options">`;
+            item.opts.forEach((opt, oIndex) => {
+                html += `<label><input type="radio" name="${prefix}_q${index}" value="${oIndex}"> ${opt}</label>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    function renderInputs(containerId, count, prefix, labelPattern) {
+        const container = document.getElementById(containerId);
+        for(let i=0; i<count; i++) {
+            container.innerHTML += `<div class="question-block">
+                <label class="question-text">${labelPattern.replace('{i}', i+1)}</label>
+                <input type="text" name="${prefix}_q${i}" autocomplete="off">
+            </div>`;
+        }
+    }
+
+    function renderTransform(containerId, data, prefix) {
+        const container = document.getElementById(containerId);
+        data.forEach((item, index) => {
+            container.innerHTML += `<div class="question-block">
+                <div class="question-text">${item.pre} 
+                <input type="text" name="${prefix}_q${index}" autocomplete="off" style="width: auto; flex-grow: 1; margin: 0 10px;"> 
+                ${item.post}</div>
+            </div>`;
+        });
+    }
+
+    // Khởi tạo form
+    renderMCQ('part-a', partA_data, 'pA');
+    renderInputs('part-b', 10, 'pB', 'Correction ({i}):');
+    renderMCQ('part-c1', partC1_data, 'pC1');
+    renderInputs('part-c2', 5, 'pC2', 'Blank ({i}):');
+    renderTransform('part-d1', partD1_data, 'pD1');
+    renderMCQ('part-c3', partC3_data, 'pC3');
+
+    // --- LOGIC CHẤM ĐIỂM ---
+    function normalizeStr(str) {
+        return str.trim().toLowerCase().replace(/[.;]$/, '');
+    }
+
+    function calculateScore() {
+        let score = 0;
+        
+        // Part A
+        partA_data.forEach((item, i) => {
+            const selected = document.querySelector(`input[name="pA_q${i}"]:checked`);
+            if(selected && parseInt(selected.value) === item.ans) score++;
+        });
+
+        // Part B
+        partB_ans.forEach((ans, i) => {
+            const val = document.querySelector(`input[name="pB_q${i}"]`).value;
+            if(normalizeStr(val) === normalizeStr(ans)) score++;
+        });
+
+        // Part C1
+        partC1_data.forEach((item, i) => {
+            const selected = document.querySelector(`input[name="pC1_q${i}"]:checked`);
+            if(selected && parseInt(selected.value) === item.ans) score++;
+        });
+
+        // Part C2
+        partC2_ans.forEach((ans, i) => {
+            const val = document.querySelector(`input[name="pC2_q${i}"]`).value;
+            if(normalizeStr(val) === normalizeStr(ans)) score++;
+        });
+
+        // Part C3
+        partC3_data.forEach((item, i) => {
+            const selected = document.querySelector(`input[name="pC3_q${i}"]:checked`);
+            if(selected && parseInt(selected.value) === item.ans) score++;
+        });
+
+        // Part D1
+        partD1_data.forEach((item, i) => {
+            const val = document.querySelector(`input[name="pD1_q${i}"]`).value;
+            const cleanVal = normalizeStr(val).replace(/\s+/g, ' '); 
+            if(cleanVal === normalizeStr(item.ans)) score++;
+        });
+
+        return score;
+    }
+
+    // --- CƠ CHẾ CHỐNG GIAN LẬN ---
+    let strikes = 0;
+    let isFinished = false;
+
+    // Chống copy/paste/chuột phải
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('paste', e => e.preventDefault());
+
+    function handleCheat() {
+        if(isFinished) return;
+        
+        // Yêu cầu học sinh phải điền tên trước khi tính là vi phạm (tránh việc mới mở trang đã vô tình bấm ra ngoài)
+        if(!document.getElementById('student_name').value) return; 
+
+        strikes++;
+        document.getElementById('strike-counter').innerText = `Cảnh cáo: ${strikes}/3`;
+        
+        if (strikes >= 3) {
+            isFinished = true;
+            document.getElementById('exam-container').style.display = 'none';
+            document.getElementById('locked-screen').style.display = 'block';
+            
+            let finalScore = calculateScore();
+            document.getElementById('locked-score-display').innerText = `${finalScore}/55`;
+            document.getElementById('hidden-score').value = finalScore;
+            
+            // Gửi dữ liệu về Formspree khi bị khóa bài
+            const form = document.getElementById('exam-form');
+            fetch(form.action, { method: 'POST', body: new FormData(form) }).catch(e => console.log(e));
+        } else {
+            alert(`⚠️ CẢNH BÁO (${strikes}/3): Bạn đã rời khỏi giao diện làm bài. Nếu vi phạm 3 lần, bài thi sẽ tự động khóa và nộp!`);
+        }
+    }
+
+    window.addEventListener('blur', handleCheat);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) handleCheat();
+    });
+
+    // --- HỆ THỐNG ĐẾM NGƯỢC ---
+    let timeLeft = 120 * 60; // 120 phút
+    const timerEl = document.getElementById('timer');
+
+    const timerInterval = setInterval(() => {
+        if (isFinished) {
+            clearInterval(timerInterval);
+            return;
+        }
+        
+        timeLeft--;
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        
+        if (timeLeft <= 300) {
+            timerEl.classList.add('danger');
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Đã hết thời gian làm bài! Hệ thống tự động nộp bài.");
+            
+            // Xử lý nếu học sinh chưa điền tên khi hết giờ
+            if(!document.getElementById('student_name').value) {
+                document.getElementById('student_name').value = "Khách (Hết giờ chưa điền tên)";
+            }
+            submitExam();
+        }
+    }, 1000);
+
+    // --- XỬ LÝ NỘP BÀI ---
+    function submitExam() {
+        isFinished = true;
+        let finalScore = calculateScore();
+        document.getElementById('hidden-score').value = finalScore;
+        document.getElementById('final-score-display').innerText = `${finalScore}/55`;
+        document.getElementById('result-overlay').style.display = 'flex';
+
+        const inputs = document.querySelectorAll('input, textarea, button');
+        inputs.forEach(input => input.disabled = true);
+        
+        const form = document.getElementById('exam-form');
+        
+        // Bật lại các field bị disable để FormData có thể lấy được dữ liệu gửi đi
+        inputs.forEach(input => input.disabled = false);
+        const formData = new FormData(form);
+        inputs.forEach(input => input.disabled = true); // Disable lại sau khi lấy xong
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        }).catch(error => console.log('Có lỗi gửi dữ liệu:', error));
+    }
+
+    document.getElementById('exam-form').addEventListener('submit', (e) => {
+        e.preventDefault(); 
+        if(confirm("Bạn có chắc chắn muốn nộp bài không?")) {
+            submitExam();
+        }
+    });
+
+</script>
+</body>
+</html>
